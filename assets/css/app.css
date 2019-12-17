@@ -1,3 +1,2 @@
-body {
-    background-color: lightblue;
-}
+@import "~bootstrap/dist/css/bootstrap";
+@import "~bootswatch/dist/minty/bootstrap";
