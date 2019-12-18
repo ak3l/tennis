@@ -546,6 +546,9 @@
     "twig/twig": {
         "version": "v3.0.0"
     },
+    "vincentlanglet/symfony-custom-coding-standard": {
+        "version": "7.0.0"
+    },
     "webmozart/assert": {
         "version": "1.6.0"
     },
