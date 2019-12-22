@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <div class="h1">{{ player.name }}</div>
+        <img src="{{ asset(player.picture) }}" alt="{{ player.name }}" height="150" width="150"/>
+    </div>
+{% endblock %}
