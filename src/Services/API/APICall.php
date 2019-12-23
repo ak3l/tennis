@@ -23,7 +23,7 @@ class APICall
      */
     public function sportradarCall($url) : array
     {
-        $key = 'n4sa62jq3xrq2ezrdaffjt2z';
+        $key = '54tkfheubjstvrngbp8f77ah';
         $client = HttpClient::create();
         $response = $client->request('GET', $url.$key);
         $statusCode = $response->getStatusCode();

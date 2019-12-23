@@ -21,25 +21,25 @@ class PlayerStatisticsFactory
     public function create(Player $player, array $statsData, PlayerStatisticsRepository $repository) : array
     {
         $statsTotal = [];
-        foreach ($statsData['periods'] as $year) {
-            foreach ($year['surfaces'] as $surface) {
+        foreach ($statsData['periods'] as $period) {
+            foreach ($period['surfaces'] as $surface) {
                 $stats = $repository->findOneBy([
                     'player'  => $player->getId(),
-                    'year'    => $year,
-                    'surface' => $surface,
+                    'year'    => $period['year'],
+                    'surface' => $surface['type'],
                 ]);
                 if (null === $stats) {
                     $stats = new PlayerStatistics();
                 }
                 $stats
                     ->setPlayer($player)
-                    ->setYear($year)
-                    ->setSurface($surface)
-                    ->setTournamentPlayed($surface['tournament_played'])
-                    ->setTournamentWon($surface['tournament_won'])
-                    ->setMatchesPlayed($surface['matches_played'])
-                    ->setMatchesWon($surface['matches_won']);
-                $statsTotal = array_push($statsTotal, $stats);
+                    ->setYear($period['year'])
+                    ->setSurface($surface['type'])
+                    ->setTournamentPlayed($surface['statistics']['tournaments_played'])
+                    ->setTournamentWon($surface['statistics']['tournaments_won'])
+                    ->setMatchesPlayed($surface['statistics']['matches_played'])
+                    ->setMatchesWon($surface['statistics']['matches_won']);
+                array_push($statsTotal, $stats);
             }
         }
 

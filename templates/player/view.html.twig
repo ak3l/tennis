@@ -1,8 +1,234 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-        <div class="h1">{{ player.name }}</div>
-        <img src="{{ asset(player.picture) }}" alt="{{ player.name }}" height="150" width="150"/>
+    <div class="row">
+        <div class="col-12">
+            <div class="h1 text-center">{{ player.name }}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5 col-md-3 col-lg-2">
+            <img
+                 src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
+                 alt="{{ player.name }}"
+                 height="150" width="150"/>
+        </div>
+        <div class="col-md-9 col-7 col-lg-10">
+            <table class="table table-hover">
+                <thead>
+                <tr class="table-info">
+                    <th scope="col">Classement</th>
+                    <th scope="col">Rang</th>
+                    <th class="d-none d-sm-block" scope="col">Points</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">Simples</th>
+                    {% if player.singlesRanking %}
+                        <td>{{ player.singlesRanking.rank }}</td>
+                        <td class="d-none d-sm-block">{{ player.singlesRanking.points }}</td>
+                    {% else %}
+                        <td>N/A</td>
+                        <td class="d-none d-sm-block">N/A</td>
+                    {% endif %}
+                </tr>
+                <tr class="table-light">
+                    <th scope="row">Doubles</th>
+                    {% if player.doublesRanking %}
+                        <td>{{ player.doublesRanking.rank }}</td>
+                        <td class="d-none d-sm-block">{{ player.doublesRanking.points }}</td>
+                    {% else %}
+                        <td>N/A</td>
+                        <td class="d-none d-sm-block">N/A</td>
+                    {% endif %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th scope="row">Nationalité</th>
+                    <td>
+                        <img class="mb-1"
+                             src="{{ asset('build/flags/'~ player.countryCode ~'.png') }}"
+                             alt="{{ player.nationality }}"
+                             height="12" width="15"/>
+                        {{ player.nationality }}</td>
+                </tr>
+                <tr class="table-light">
+                    <th scope="row">Date de naissance</th>
+                    {% set age = date('now').diff(player.birthDate).days/365.25 %}
+                    <td>{{ player.birthDate | date('d/m/Y') }} ({{ age | round(0, 'floor') }} ans)</td>
+                </tr>
+                <tr>
+                    <th scope="row">Meilleur Classement</th>
+                    <td>{{ player.highestSinglesRanking }} (atteint le {{ player.highestSinglesRankingDate | date('m/Y)') }}</td>
+                </tr>
+                <tr class="table-light">
+                    <th scope="row">Taille / Poids</th>
+                    <td>{{ player.height }} cm / {{ player.weight }} kg</td>
+                </tr>
+                <tr>
+                    <th scope="row">Main dominante</th>
+                    <td>
+                        {% if player.handedness == 'right' %}
+                            Droite
+                        {% elseif player.handedness == 'left' %}
+                            Gauche
+                        {% else %}
+                            Inconnue
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="table-light">
+                    <th scope="row">Pro depuis</th>
+                    <td>{{ player.proYear }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#home">Résumé</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#matchs">Matchs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#stats">Statistiques</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#rankings">Classement</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#comments">Commentaires</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div id="playerInfos" class="tab-content">
+            <div class="tab-pane fade active show" id="home">
+                <div>A venir</div>
+            </div>
+            <div class="tab-pane fade" id="matchs">
+                <div>Prochainement</div>
+            </div>
+            <div class="tab-pane fade" id="stats">
+                <ul class="nav nav-tabs">
+                    {% for stats in formattedStats %}
+                        <li class="nav-item">
+                            <a class="nav-link text-secondary small" data-toggle="tab" href="{{ '#year' ~ stats.year }}">{{ stats.year }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div id="playerStats" class="tab-content">
+                    <div class="col-12 h5 mt-3 mb-2">Statistiques des matchs</div>
+                    {% for stats in formattedStats %}
+                        {% if loop.first %}
+                    <div class="tab-pane fade active show" id="{{ 'year'~ stats.year }}">
+                        {% else %}
+                    <div class="tab-pane fade" id="{{ 'year'~ stats.year }}">
+                        {% endif %}
+                        <div class="col-12">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Surface</th>
+                                        <th scope="col">Matches joués</th>
+                                        <th scope="col">Matchs gagnés</th>
+                                        <th class="d-none d-sm-block" scope="col">Matchs perdus</th>
+                                        <th scope="col">% de victoire</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    <tr class="table-primary">
+                                        <th class="text-left" scope="row">Terre Battue</th>
+                                        <td>{{ stats.matchesClayPlayed }}</td>
+                                        <td>{{ stats.matchesClayWon }}</td>
+                                        <td class="d-none d-sm-block">
+                                            {% set matchesClayLost = stats.matchesClayPlayed - stats.matchesClayWon  %}
+                                            {{ matchesClayLost }}
+                                        </td>
+                                        <td>
+                                            {% if stats.matchesClayPlayed > 0 %}
+                                                {{ (100*stats.matchesClayWon/stats.matchesClayPlayed) | round }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <th class="text-left" scope="row">Gazon</th>
+                                        <td>{{ stats.matchesGrassPlayed }}</td>
+                                        <td>{{ stats.matchesGrassWon }}</td>
+                                        <td class="d-none d-sm-block">
+                                            {% set matchesGrassLost = stats.matchesGrassPlayed - stats.matchesGrassWon  %}
+                                            {{ matchesGrassLost }}
+                                        </td>
+                                        <td>
+                                            {% if stats.matchesGrassPlayed > 0 %}
+                                                {{ (100*stats.matchesGrassWon/stats.matchesGrassPlayed) | round }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <th class="text-left" scope="row">Dur</th>
+                                        <td>{{ stats.matchesHardPlayed }}</td>
+                                        <td>{{ stats.matchesHardWon }}</td>
+                                        <td class="d-none d-sm-block">
+                                            {% set matchesHardLost = stats.matchesHardPlayed - stats.matchesHardWon  %}
+                                            {{ matchesHardLost }}
+                                        </td>
+                                        <td>
+                                            {% if stats.matchesHardPlayed > 0 %}
+                                                {{ (100*stats.matchesHardWon/stats.matchesHardPlayed) | round }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-secondary text-center">
+                                    <tr>
+                                    <th class="text-left" scope="row">Total</th>
+                                        {% set matchesTotalPlayed = stats.matchesClayPlayed + stats.matchesGrassPlayed + stats.matchesHardPlayed %}
+                                        {% set matchesTotalWon = stats.matchesClayWon + stats.matchesGrassWon + stats.matchesHardWon %}
+                                        {% set matchesTotalLost = matchesClayLost + matchesGrassLost + matchesHardLost %}
+                                    <td>{{ matchesTotalPlayed }}</td>
+                                    <td>{{ matchesTotalWon }}</td>
+                                    <td class="d-none d-sm-block">{{ matchesTotalLost }}</td>
+                                    <td>
+                                        {% if matchesTotalPlayed > 0  %}
+                                            {{ (100*matchesTotalWon/matchesTotalPlayed) | round }}
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="rankings">
+                <div>Prochainement</div>
+            </div>
+            <div class="tab-pane fade" id="comments">
+                <div>Prochainement</div>
+            </div>
+        </div>
     </div>
 {% endblock %}

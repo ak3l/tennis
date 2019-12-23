@@ -4,7 +4,6 @@ namespace App\Factory;
 
 use App\Entity\Player;
 use App\Entity\PlayerSinglesRanking;
-use App\Repository\PlayerSinglesRankingRepository;
 
 /**
  * Class PlayerSinglesRankingFactory
@@ -17,7 +16,7 @@ class PlayerSinglesRankingFactory
      *
      * @return PlayerSinglesRanking
      */
-    public function create(Player $player, array $rankingData) : PlayerSinglesRanking
+    public function create(Player $player, array $rankingData) : ?PlayerSinglesRanking
     {
         $singlesRanking = $player->getSinglesRanking();
         if (null === $singlesRanking) {
@@ -36,6 +35,8 @@ class PlayerSinglesRankingFactory
                     ->setRank($rankingData[0]['rank'])
                     ->setPoints($rankingData[0]['points'])
                     ->setName($rankingData[0]['name']);
+            } else {
+                return null;
             }
         }
 

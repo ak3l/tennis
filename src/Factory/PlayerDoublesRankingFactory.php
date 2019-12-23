@@ -4,7 +4,6 @@ namespace App\Factory;
 
 use App\Entity\Player;
 use App\Entity\PlayerDoublesRanking;
-use App\Repository\PlayerDoublesRankingRepository;
 
 /**
  * Class PlayerDoublesRankingFactory
@@ -17,7 +16,7 @@ class PlayerDoublesRankingFactory
      *
      * @return PlayerDoublesRanking
      */
-    public function create(Player $player, array $rankingData) : PlayerDoublesRanking
+    public function create(Player $player, array $rankingData) : ?PlayerDoublesRanking
     {
         $doublesRanking = $player->getDoublesRanking();
         if (null === $doublesRanking) {
@@ -36,6 +35,8 @@ class PlayerDoublesRankingFactory
                     ->setRank($rankingData[1]['rank'])
                     ->setPoints($rankingData[1]['points'])
                     ->setName($rankingData[1]['name']);
+            } else {
+                return null;
             }
         }
 
