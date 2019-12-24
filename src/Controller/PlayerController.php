@@ -69,7 +69,15 @@ class PlayerController extends AbstractController
      */
     public function searchPlayer(Request $request, PlayerRepository $playerRepo) : Response
     {
-        return new Response();
+        $playerSearch = $request->request->get('player_search')['playerSearch'];
+        $players = null;
+        if (strlen($playerSearch) > 1) {
+            $players = $playerRepo->searchPlayerByName($playerSearch);
+        }
+
+        return $this->render('player/search.html.twig', [
+            'players' => $players,
+        ]);
     }
 
     /**
