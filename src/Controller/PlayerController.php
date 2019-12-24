@@ -14,11 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 /**
  * Class PlayerController
@@ -47,13 +43,13 @@ class PlayerController extends AbstractController
      *
      * @Route("/addplayer/", name="player_add")
      *
-     * @throws TransportExceptionInterface|ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface
+     * @throws ExceptionInterface
      */
     public function addPlayer(APICall $apicall, EntityManagerInterface $em, PlayerFactory $playerFactory, PlayerSinglesRankingFactory $singlesRankingFactory, PlayerDoublesRankingFactory $doublesRankingFactory, PlayerStatisticsFactory $statisticsFactory) : Response
     {
         $playerRepo = $this->getDoctrine()->getRepository(Player::class);
         $statsRepo = $this->getDoctrine()->getRepository(PlayerStatistics::class);
-        $id = 14342;
+        $id = 14486;
         $url = 'https://api.sportradar.com/tennis-t2/fr/players/sr:competitor:'.$id.'/profile.json?api_key=';
         $playerArray = $apicall->sportradarCall($url);
         $player = $playerFactory->create($playerArray['player'], $playerRepo);
@@ -86,10 +82,12 @@ class PlayerController extends AbstractController
     public function viewPlayer(Player $player, PlayerStatisticsFormatter $formatter) : Response
     {
         $formattedStats = $formatter->statsFormatter($player->getStatistics());
+        $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
 
         return $this->render('player/view.html.twig', [
             'player'         => $player,
             'formattedStats' => $formattedStats,
+            'picture'        => $pictureExists,
         ]);
     }
 }

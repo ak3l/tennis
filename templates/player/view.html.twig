@@ -8,10 +8,17 @@
     </div>
     <div class="row">
         <div class="col-5 col-md-3 col-lg-2">
-            <img
-                 src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
-                 alt="{{ player.name }}"
-                 height="150" width="150"/>
+            {% if picture %}
+                <img
+                     src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
+                     alt="{{ player.name }}"
+                     height="150" width="150"/>
+            {% else %}
+                <img
+                        src="{{ asset('build/players/nopicture.png' ) }}"
+                        alt="{{ player.name }}"
+                        height="150" width="150"/>
+            {% endif %}
         </div>
         <div class="col-md-9 col-7 col-lg-10">
             <table class="table table-hover">
@@ -115,6 +122,7 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-12">
         <div id="playerInfos" class="tab-content">
             <div class="tab-pane fade active show" id="home">
                 <div>A venir</div>
@@ -229,6 +237,7 @@
             <div class="tab-pane fade" id="comments">
                 <div>Prochainement</div>
             </div>
+        </div>
         </div>
     </div>
 {% endblock %}
