@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% block title %}Recherche de joueur{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12 mb-2">
+            <span class="h4 mb-2">Résultat de la recherche </span><span class="text-secondary">- {{ players | length }} joueur(s) correspondant(s)</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            {% if players %}
+                {% for player in players %}
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <a href="{{ path('player_view', {'id': player.id}) }}">
+                                        <img class="mr-2"
+                                             src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
+                                             alt="{{ player.name }}"
+                                             height="50" width="50"/>
+                                        {{ player.name }}
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endfor %}
+            {% else %}
+                <p>Votre recherche n'a retourné aucun résultat. <br/>
+                    Veuillez vérifier l'ortographe du nom. <br/>
+                    La recherche doit faire au moins 2 caractères.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
