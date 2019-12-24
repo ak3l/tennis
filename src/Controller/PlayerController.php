@@ -8,10 +8,13 @@ use App\Factory\PlayerDoublesRankingFactory;
 use App\Factory\PlayerFactory;
 use App\Factory\PlayerSinglesRankingFactory;
 use App\Factory\PlayerStatisticsFactory;
+use App\Form\PlayerSearchType;
+use App\Repository\PlayerRepository;
 use App\Services\API\APICall;
 use App\Services\PlayerStatistics\PlayerStatisticsFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -24,11 +27,49 @@ class PlayerController extends AbstractController
     /**
      * @return Response
      *
-     * @Route("/players", name="player_index")
+     * @Route("/player", name="player_index")
      */
     public function index()
     {
-        return $this->render('player/index.html.twig');
+        $formSearch = $this->createForm(PlayerSearchType::class);
+
+        return $this->render('player/index.html.twig', [
+            'formSearch' => $formSearch->createView(),
+        ]);
+    }
+
+
+    /**
+     * @param Player                    $player
+     * @param PlayerStatisticsFormatter $formatter
+     *
+     * @return Response
+     *
+     * @Route("/player/{id}", name="player_view", requirements={"id":"\d+"})
+     */
+    public function viewPlayer(Player $player, PlayerStatisticsFormatter $formatter) : Response
+    {
+        $formattedStats = $formatter->statsFormatter($player->getStatistics());
+        $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
+
+        return $this->render('player/view.html.twig', [
+            'player'         => $player,
+            'formattedStats' => $formattedStats,
+            'picture'        => $pictureExists,
+        ]);
+    }
+
+    /**
+     * @param Request          $request
+     * @param PlayerRepository $playerRepo
+     *
+     * @Route("player/search/", name="player_search")
+     *
+     * @return Response
+     */
+    public function searchPlayer(Request $request, PlayerRepository $playerRepo) : Response
+    {
+        return new Response();
     }
 
     /**
@@ -69,25 +110,5 @@ class PlayerController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('player_view', ['id' => $player->getId()]);
-    }
-
-    /**
-     * @param Player                    $player
-     * @param PlayerStatisticsFormatter $formatter
-     *
-     * @return Response
-     *
-     * @Route("/player/{id}", name="player_view", requirements={"id":"\d+"})
-     */
-    public function viewPlayer(Player $player, PlayerStatisticsFormatter $formatter) : Response
-    {
-        $formattedStats = $formatter->statsFormatter($player->getStatistics());
-        $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
-
-        return $this->render('player/view.html.twig', [
-            'player'         => $player,
-            'formattedStats' => $formattedStats,
-            'picture'        => $pictureExists,
-        ]);
     }
 }

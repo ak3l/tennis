@@ -3,5 +3,16 @@
 {% block title %}Joueurs{% endblock %}
 
 {% block body %}
-    <a href="{{ path('player_view', {'id': 3}) }}">Raonic</a>
+    <div class="row">
+        <div class="col-10 col-md-4">
+            {{ form_start(formSearch, { 'attr': {'action': path('player_search')}}) }}
+            {{ form_widget(formSearch, {'attr': {'placeholder': 'Novak Djokovic...'}}) }}
+        </div>
+        <div class="col-2 col-md-1 pl-0 d-flex align-items-center">
+            <button  class="btn btn-info mt-3" type="submit">
+                <span class="fas fa-search"></span>
+            </button>
+            {{ form_end(formSearch)  }}
+        </div>
+    </div>
 {% endblock %}
