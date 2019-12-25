@@ -66,6 +66,12 @@ class PlayerController extends AbstractController
         $player = $this->repository->findOneBy([
             'apiId' => 'sr:competitor:'.$apiIdInt,
         ]);
+        if ($player->getSlug() !== $slug) {
+            return $this->redirectToRoute('player_view', [
+                'apiIdInt' => $player->getApiIdInt(),
+                'slug'     => $player->getSlug(),
+            ], 301);
+        }
         $formattedStats = $formatter->statsFormatter($player->getStatistics());
         $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
 
