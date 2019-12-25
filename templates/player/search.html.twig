@@ -10,23 +10,21 @@
     <div class="row">
         <div class="col-12">
             {% if players %}
-                {% for player in players %}
-                    <table class="table table-hover">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <a href="{{ path('player_view', {'id': player.id}) }}">
-                                        <img class="mr-2"
-                                             src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
-                                             alt="{{ player.name }}"
-                                             height="50" width="50"/>
-                                        {{ player.name }}
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                {% endfor %}
+                <table class="table table-hover">
+                    {% for player in players %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('player_view', {'apiIdInt': player.apiIdInt, 'slug': player.slug}) }}">
+                                    <img class="mr-2"
+                                         src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
+                                         alt="{{ player.name }}"
+                                         height="50" width="50"/>
+                                    {{ player.name }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
             {% else %}
                 <p>Votre recherche n'a retourné aucun résultat. <br/>
                     Veuillez vérifier l'ortographe du nom. <br/>

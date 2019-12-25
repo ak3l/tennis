@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Player;
 use App\Entity\PlayerStatistics;
 use App\Factory\PlayerDoublesRankingFactory;
 use App\Factory\PlayerFactory;
@@ -25,6 +24,21 @@ use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 class PlayerController extends AbstractController
 {
     /**
+     * @var PlayerRepository
+     */
+    private $repository;
+
+    /**
+     * PlayerController constructor.
+     *
+     * @param PlayerRepository $repository
+     */
+    public function __construct(PlayerRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
      * @return Response
      *
      * @Route("/player", name="player_index")
@@ -38,17 +52,20 @@ class PlayerController extends AbstractController
         ]);
     }
 
-
     /**
-     * @param Player                    $player
+     * @param string                    $slug
+     * @param int                       $apiIdInt
      * @param PlayerStatisticsFormatter $formatter
      *
      * @return Response
      *
-     * @Route("/player/{id}", name="player_view", requirements={"id":"\d+"})
+     * @Route("/player/{slug}-{apiIdInt}", name="player_view", requirements={"apiIdInt":"\d+", "slug":"[a-z0-9\-]*"})
      */
-    public function viewPlayer(Player $player, PlayerStatisticsFormatter $formatter) : Response
+    public function viewPlayer(string $slug, int $apiIdInt, PlayerStatisticsFormatter $formatter) : Response
     {
+        $player = $this->repository->findOneBy([
+            'apiId' => 'sr:competitor:'.$apiIdInt,
+        ]);
         $formattedStats = $formatter->statsFormatter($player->getStatistics());
         $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
 
@@ -60,19 +77,18 @@ class PlayerController extends AbstractController
     }
 
     /**
-     * @param Request          $request
-     * @param PlayerRepository $playerRepo
+     * @param Request $request
      *
      * @Route("player/search/", name="player_search")
      *
      * @return Response
      */
-    public function searchPlayer(Request $request, PlayerRepository $playerRepo) : Response
+    public function searchPlayer(Request $request) : Response
     {
         $playerSearch = $request->request->get('player_search')['playerSearch'];
         $players = null;
         if (strlen($playerSearch) > 1) {
-            $players = $playerRepo->searchPlayerByName($playerSearch);
+            $players = $this->repository->searchPlayerByName($playerSearch);
         }
 
         return $this->render('player/search.html.twig', [
@@ -96,12 +112,11 @@ class PlayerController extends AbstractController
      */
     public function addPlayer(APICall $apicall, EntityManagerInterface $em, PlayerFactory $playerFactory, PlayerSinglesRankingFactory $singlesRankingFactory, PlayerDoublesRankingFactory $doublesRankingFactory, PlayerStatisticsFactory $statisticsFactory) : Response
     {
-        $playerRepo = $this->getDoctrine()->getRepository(Player::class);
         $statsRepo = $this->getDoctrine()->getRepository(PlayerStatistics::class);
         $id = 14486;
         $url = 'https://api.sportradar.com/tennis-t2/fr/players/sr:competitor:'.$id.'/profile.json?api_key=';
         $playerArray = $apicall->sportradarCall($url);
-        $player = $playerFactory->create($playerArray['player'], $playerRepo);
+        $player = $playerFactory->create($playerArray['player'], $this->repository);
         $singlesRanking = $singlesRankingFactory->create($player, $playerArray['rankings']);
         $doublesRanking = $doublesRankingFactory->create($player, $playerArray['rankings']);
         $statistics = $statisticsFactory->create($player, $playerArray['statistics'], $statsRepo);
