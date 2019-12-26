@@ -86,7 +86,8 @@ class PlayerController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param Request         $request
+     * @param SearchFormatter $formatter
      *
      * @Route("player/search/", name="player_search")
      *
@@ -97,6 +98,13 @@ class PlayerController extends AbstractController
         $playerSearch = $request->request->get('player_search')['playerSearch'];
         $searchArray = $formatter->formatSearch($playerSearch);
         $foundPlayers = $formatter->getSearchedPlayers($searchArray, $this->repository);
+
+        if (count($foundPlayers) === 1) {
+            return $this->redirectToRoute('player_view', [
+                'apiIdInt' => $foundPlayers[0]->getApiIdInt(),
+                'slug'     => $foundPlayers[0]->getSlug(),
+            ]);
+        }
 
         return $this->render('player/search.html.twig', [
             'players' => $foundPlayers,
