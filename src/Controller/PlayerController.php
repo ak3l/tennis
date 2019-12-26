@@ -11,6 +11,7 @@ use App\Form\PlayerSearchType;
 use App\Repository\PlayerRepository;
 use App\Services\API\APICall;
 use App\Services\PlayerStatistics\PlayerStatisticsFormatter;
+use App\Services\Search\SearchFormatter;
 use App\Services\Search\SearchResultsToJson;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,10 +19,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 /**
@@ -95,31 +92,32 @@ class PlayerController extends AbstractController
      *
      * @return Response
      */
-    public function searchPlayer(Request $request) : Response
+    public function searchPlayer(Request $request, SearchFormatter $formatter) : Response
     {
         $playerSearch = $request->request->get('player_search')['playerSearch'];
-        $players = null;
-        if (strlen($playerSearch) > 1) {
-            $players = $this->repository->searchPlayerByName($playerSearch);
-        }
+        $searchArray = $formatter->formatSearch($playerSearch);
+        $foundPlayers = $formatter->getSearchedPlayers($searchArray, $this->repository);
 
         return $this->render('player/search.html.twig', [
-            'players' => $players,
+            'players' => $foundPlayers,
         ]);
     }
 
     /**
-     * @param string $query
+     * @param Request             $request
+     * @param SearchResultsToJson $searchResultsToJson
+     * @param SearchFormatter     $formatter
      *
      * @return Response
      *
-     * @Route("/player/livesearch/{query}", name="player_lsearch")
-     *
+     * @Route("/player/livesearch", name="player_lsearch")
      */
-    public function searchPlayerLive(string $query, SearchResultsToJson $searchResultsToJson) : Response
+    public function searchPlayerLive(Request $request, SearchResultsToJson $searchResultsToJson, SearchFormatter $formatter) : Response
     {
-        $results = $this->repository->searchPlayerByName($query);
-        $jsonResponse = $searchResultsToJson->searchResultsToJson($results);
+        $query = $request->query->get('query');
+        $searchArray = $formatter->formatSearch($query);
+        $foundPlayers = $formatter->getSearchedPlayers($searchArray, $this->repository);
+        $jsonResponse = $searchResultsToJson->searchResultsToJson($foundPlayers);
 
         return new JsonResponse($jsonResponse, 200, [], true);
     }
@@ -141,7 +139,7 @@ class PlayerController extends AbstractController
     public function addPlayer(APICall $apicall, EntityManagerInterface $em, PlayerFactory $playerFactory, PlayerSinglesRankingFactory $singlesRankingFactory, PlayerDoublesRankingFactory $doublesRankingFactory, PlayerStatisticsFactory $statisticsFactory) : Response
     {
         $statsRepo = $this->getDoctrine()->getRepository(PlayerStatistics::class);
-        $id = 14486;
+        $id = 117916;
         $url = 'https://api.sportradar.com/tennis-t2/fr/players/sr:competitor:'.$id.'/profile.json?api_key=';
         $playerArray = $apicall->sportradarCall($url);
         $player = $playerFactory->create($playerArray['player'], $this->repository);
@@ -160,6 +158,9 @@ class PlayerController extends AbstractController
         }
         $em->flush();
 
-        return $this->redirectToRoute('player_view', ['id' => $player->getId()]);
+        return $this->redirectToRoute('player_view', [
+            'apiIdInt' => $player->getApiIdInt(),
+            'slug'     => $player->getSlug(),
+        ]);
     }
 }

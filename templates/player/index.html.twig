@@ -6,7 +6,9 @@
     <div class="row">
         <div class="col-10 col-md-4">
             {{ form_start(formSearch, { 'attr': {'action': path('player_search')}}) }}
-            {{ form_widget(formSearch) }}
+            {{ form_row(formSearch.playerSearch,
+                {'id': 'playerSearch', 'attr': {'placeholder': 'Novak Djokovic...'}})
+            }}
         </div>
         <div class="col-2 col-md-1 pl-0 d-flex align-items-center">
             <button  class="btn btn-info mt-3" type="submit">
@@ -15,4 +17,31 @@
             {{ form_end(formSearch)  }}
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function onKeyUp(event) {
+            const url = "{{ path('player_lsearch') }}";
+            axios.get(url, {
+                params: {
+                    query: this.value
+                    }
+                })
+                .then(function (response) {
+                    handleResponse(response)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function handleResponse (response) {
+            console.log(response)
+        }
+
+        const searchInput = document.getElementById('playerSearch')
+        searchInput.addEventListener("input", onKeyUp);
+    </script>
 {% endblock %}
