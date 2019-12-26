@@ -11,11 +11,17 @@ use App\Form\PlayerSearchType;
 use App\Repository\PlayerRepository;
 use App\Services\API\APICall;
 use App\Services\PlayerStatistics\PlayerStatisticsFormatter;
+use App\Services\Search\SearchResultsToJson;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 /**
@@ -100,6 +106,22 @@ class PlayerController extends AbstractController
         return $this->render('player/search.html.twig', [
             'players' => $players,
         ]);
+    }
+
+    /**
+     * @param string $query
+     *
+     * @return Response
+     *
+     * @Route("/player/livesearch/{query}", name="player_lsearch")
+     *
+     */
+    public function searchPlayerLive(string $query, SearchResultsToJson $searchResultsToJson) : Response
+    {
+        $results = $this->repository->searchPlayerByName($query);
+        $jsonResponse = $searchResultsToJson->searchResultsToJson($results);
+
+        return new JsonResponse($jsonResponse, 200, [], true);
     }
 
     /**
