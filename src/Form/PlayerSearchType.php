@@ -19,10 +19,7 @@ class PlayerSearchType extends AbstractType
     {
         $builder
             ->add('playerSearch', TextType::class, [
-                'label' => 'Cherchez un joueur',
-                'attr'  => [
-                    'placeholder' => 'Novak Djokovic...',
-                ],
+                'label' => 'Cherchez un joueur :',
             ]);
     }
 }

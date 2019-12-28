@@ -29,14 +29,12 @@ class PlayerRepository extends ServiceEntityRepository
      *
      * @return array
      */
-    public function searchPlayerByName(string $name) : array
+    public function searchPlayersByName(string $name) : array
     {
-        $query = $this->createQueryBuilder('p')
+        return $this->createQueryBuilder('p')
             ->where('LOWER(p.name) LIKE LOWER(:name)')
             ->setParameter('name', '%'.$name.'%')
             ->getQuery()
             ->getResult();
-
-        return $query;
     }
 }

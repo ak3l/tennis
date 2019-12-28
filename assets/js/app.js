@@ -12,6 +12,13 @@ import('../css/app.scss');
 // const $ = require('jquery');
 
 const $ = require('jquery');
+
+// create global $ and jQuery variables
+global.$ = global.jQuery = $;
+
 // this "modifies" the jquery module: adding behavior to it
 // the bootstrap module doesn't export/return anything
 require('bootstrap');
+
+import axios from 'axios';
+global.axios = axios;
