@@ -97,7 +97,7 @@ class PlayerController extends AbstractController
     {
         $playerSearch = $request->request->get('player_search')['playerSearch'];
         $searchArray = $formatter->formatSearch($playerSearch);
-        $foundPlayers = $formatter->getSearchedPlayers($searchArray, $this->repository);
+        $foundPlayers = $formatter->getSearchedPlayers($searchArray);
 
         if (count($foundPlayers) === 1) {
             return $this->redirectToRoute('player_view', [
@@ -124,7 +124,7 @@ class PlayerController extends AbstractController
     {
         $query = $request->query->get('query');
         $searchArray = $formatter->formatSearch($query);
-        $foundPlayers = $formatter->getSearchedPlayers($searchArray, $this->repository);
+        $foundPlayers = $formatter->getSearchedPlayers($searchArray);
         $jsonResponse = $searchResultsToJson->searchResultsToJson($foundPlayers);
 
         return new JsonResponse($jsonResponse, 200, [], true);
