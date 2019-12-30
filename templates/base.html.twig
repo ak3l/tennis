@@ -27,8 +27,15 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('player_index') }}">Joueurs</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('rankings_index') }}">Classements</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Classements
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ path('rankings_official') }}">Officiel</a>
+                                    <a class="dropdown-item" href="{{ path('rankings_live') }}">Live</a>
+                                    <a class="dropdown-item" href="{{ path('rankings_race') }}">Race</a>
+                                </div>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Calendrier</a>
@@ -53,6 +60,22 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            <script>
+                function toggleDropdown (e) {
+                    const _d = $(e.target).closest('.dropdown'),
+                        _m = $('.dropdown-menu', _d);
+                    setTimeout(function(){
+                        const shouldOpen = e.type !== 'click' && _d.is(':hover');
+                        _m.toggleClass('show', shouldOpen);
+                        _d.toggleClass('show', shouldOpen);
+                        $('[data-toggle="dropdown"]', _d).attr('aria-expanded', shouldOpen);
+                    }, e.type === 'mouseleave' ? 300 : 0);
+                }
+
+                $('body')
+                    .on('mouseenter mouseleave','.dropdown',toggleDropdown)
+                    .on('click', '.dropdown-menu a', toggleDropdown);
+            </script>
         {% endblock %}
     </body>
 </html>

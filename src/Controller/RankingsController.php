@@ -18,17 +18,52 @@ class RankingsController extends AbstractController
      *
      * @return Response
      *
-     * @Route("/rankings", name="rankings_index")
-     *
      * @throws ExceptionInterface
+     *
+     * @Route("/rankings/official", name="rankings_official")
      */
-    public function index(APICall $apicall)
+    public function showOfficial(APICall $apicall)
     {
         $url = 'https://api.sportradar.com/tennis-t2/en/players/rankings.json?api_key=';
-/*        $rankings = $apicall->sportradarCall($url);*/
+        $officialRankings = $apicall->sportradarCall($url);
+        $wtaRankings = $officialRankings['rankings'][0];
+        $atpRankings = $officialRankings['rankings'][1];
 
-        return $this->render('rankings/index.html.twig', [
-            'controller_name' => 'RankingsController',
+        return $this->render('rankings/official.html.twig', [
+            'wtaRankings' => $wtaRankings,
+            'atpRankings' => $atpRankings,
+        ]);
+    }
+
+    /**
+     * @return Response
+     *
+     * @Route("/rankings/live", name="rankings_live")
+     */
+    public function showLive() : Response
+    {
+        return $this->render('rankings/live.html.twig');
+    }
+
+    /**
+     * @param APICall $apicall
+     *
+     * @return Response
+     *
+     * @throws ExceptionInterface
+     *
+     * @Route("/rankings/race", name="rankings_race")
+     */
+    public function showRace(APICall $apicall) : Response
+    {
+        $url = 'https://api.sportradar.com/tennis-t2/en/players/race_rankings.json?api_key=';
+        $raceRankings = $apicall->sportradarCall($url);
+        $wtaRankings = $raceRankings['rankings'][0];
+        $atpRankings = $raceRankings['rankings'][1];
+
+        return $this->render('rankings/race.html.twig', [
+            'wtaRankings' => $wtaRankings,
+            'atpRankings' => $atpRankings,
         ]);
     }
 }
