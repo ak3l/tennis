@@ -8,17 +8,10 @@
     </div>
     <div class="row">
         <div class="col-5 col-md-3 col-lg-2">
-            {% if picture %}
-                <img
-                     src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
-                     alt="{{ player.name }}"
-                     height="150" width="150"/>
-            {% else %}
-                <img
-                        src="{{ asset('build/players/nopicture.png' ) }}"
-                        alt="{{ player.name }}"
-                        height="150" width="150"/>
-            {% endif %}
+            <img
+                 src="{{ asset('build/players/'~ player.abbreviation | playerPicture ~ '.jpg') }}"
+                 alt="{{ player.name }}"
+                 height="150" width="150"/>
         </div>
         <div class="col-md-9 col-7 col-lg-10">
             <table class="table table-hover">

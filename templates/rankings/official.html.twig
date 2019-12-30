@@ -50,11 +50,15 @@
                             </td>
                             <td>{{ player.rank }}</td>
                             <td>
-                                <img class="mb-1"
-                                     src="{{ asset('build/flags/'~ player.player.country_code ~'.png') }}"
-                                     alt="{{ player.player.nationality }}"
-                                     height="12" width="15"/>
-                                <span>{{ player.player.name }}</span>
+                                <a href="{{ path('player_view', {
+                                    'apiIdInt': player.player.id | apiId,
+                                    'slug': player.player.name | slugify})  }}">
+                                    <img class="mb-1"
+                                         src="{{ asset('build/flags/'~ player.player.country_code ~'.png') }}"
+                                         alt="{{ player.player.nationality }}"
+                                         height="12" width="15"/>
+                                    <span>{{ player.player.name }}</span>
+                                </a>
                             </td>
                             <td>{{ player.points }}</td>
                         </tr>
@@ -102,11 +106,15 @@
                                 </td>
                                 <td>{{ player.rank }}</td>
                                 <td>
+                                    <a href="{{ path('player_view', {
+                                        'apiIdInt': player.player.id | apiId,
+                                        'slug': player.player.name | slugify})  }}">
                                     <img class="mb-1"
                                          src="{{ asset('build/flags/'~ player.player.country_code ~'.png') }}"
                                          alt="{{ player.player.nationality }}"
                                          height="12" width="15"/>
                                     <span>{{ player.player.name }}</span>
+                                    </a>
                                 </td>
                                 <td>{{ player.points }}</td>
                             </tr>

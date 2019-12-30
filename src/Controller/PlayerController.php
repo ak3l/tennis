@@ -76,12 +76,10 @@ class PlayerController extends AbstractController
             ], 301);
         }
         $formattedStats = $formatter->statsFormatter($player->getStatistics());
-        $pictureExists = file_exists('../public/build/players/'.$player->getAbbreviation().'.jpg');
 
         return $this->render('player/view.html.twig', [
             'player'         => $player,
             'formattedStats' => $formattedStats,
-            'picture'        => $pictureExists,
         ]);
     }
 
@@ -142,7 +140,7 @@ class PlayerController extends AbstractController
      *
      * @Route("/addplayer/", name="player_add")
      *
-     * @throws ExceptionInterface
+     * @throws ExceptionInterface|\Exception
      */
     public function addPlayer(APICall $apicall, EntityManagerInterface $em, PlayerFactory $playerFactory, PlayerSinglesRankingFactory $singlesRankingFactory, PlayerDoublesRankingFactory $doublesRankingFactory, PlayerStatisticsFactory $statisticsFactory) : Response
     {
