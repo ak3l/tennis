@@ -5,6 +5,8 @@ namespace App\Factory;
 use App\Entity\Player;
 use App\Entity\PlayerStatistics;
 use App\Repository\PlayerStatisticsRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Class PlayerStatisticsFactory
@@ -17,24 +19,30 @@ class PlayerStatisticsFactory
     private $statsRepo;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
      * PlayerStatisticsFactory constructor.
      *
      * @param PlayerStatisticsRepository $statsRepo
+     * @param EntityManagerInterface     $em
      */
-    public function __construct(PlayerStatisticsRepository $statsRepo)
+    public function __construct(PlayerStatisticsRepository $statsRepo, EntityManagerInterface $em)
     {
         $this->statsRepo = $statsRepo;
+        $this->em = $em;
     }
 
     /**
      * @param Player $player
      * @param array  $statsData
      *
-     * @return array
+     * @return Collection
      */
-    public function create(Player $player, array $statsData) : array
+    public function create(Player $player, array $statsData) : Collection
     {
-        $statsTotal = [];
         foreach ($statsData['periods'] as $period) {
             foreach ($period['surfaces'] as $surface) {
                 $stats = $this->statsRepo->findOneBy([
@@ -45,18 +53,19 @@ class PlayerStatisticsFactory
                 if (null === $stats) {
                     $stats = new PlayerStatistics();
                 }
+                $player->addStatistic($stats);
                 $stats
-                    ->setPlayer($player)
                     ->setYear($period['year'])
                     ->setSurface($surface['type'])
                     ->setTournamentPlayed($surface['statistics']['tournaments_played'])
                     ->setTournamentWon($surface['statistics']['tournaments_won'])
                     ->setMatchesPlayed($surface['statistics']['matches_played'])
                     ->setMatchesWon($surface['statistics']['matches_won']);
-                array_push($statsTotal, $stats);
+                $this->em->persist($stats);
             }
         }
+        $this->em->flush();
 
-        return $statsTotal;
+        return $player->getStatistics();
     }
 }
