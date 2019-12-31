@@ -11,16 +11,30 @@ use App\Repository\PlayerRepository;
 class PlayerFactory
 {
     /**
-     * @param array            $playerData
-     * @param PlayerRepository $repository
+     * @var PlayerRepository
+     */
+    private $playerRepo;
+
+    /**
+     * PlayerFactory constructor.
+     *
+     * @param PlayerRepository $playerRepo
+     */
+    public function __construct(PlayerRepository $playerRepo)
+    {
+        $this->playerRepo = $playerRepo;
+    }
+
+    /**
+     * @param array $playerData
      *
      * @return Player
      *
      * @throws \Exception
      */
-    public function create(array $playerData, PlayerRepository $repository) : Player
+    public function create(array $playerData) : Player
     {
-        $player = $repository->findOneBy([
+        $player = $this->playerRepo->findOneBy([
             'apiId' => $playerData['id'],
         ]);
         if (null === $player) {

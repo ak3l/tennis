@@ -12,18 +12,32 @@ use App\Repository\PlayerStatisticsRepository;
 class PlayerStatisticsFactory
 {
     /**
-     * @param Player                     $player
-     * @param array                      $statsData
-     * @param PlayerStatisticsRepository $repository
+     * @var PlayerStatisticsRepository
+     */
+    private $statsRepo;
+
+    /**
+     * PlayerStatisticsFactory constructor.
+     *
+     * @param PlayerStatisticsRepository $statsRepo
+     */
+    public function __construct(PlayerStatisticsRepository $statsRepo)
+    {
+        $this->statsRepo = $statsRepo;
+    }
+
+    /**
+     * @param Player $player
+     * @param array  $statsData
      *
      * @return array
      */
-    public function create(Player $player, array $statsData, PlayerStatisticsRepository $repository) : array
+    public function create(Player $player, array $statsData) : array
     {
         $statsTotal = [];
         foreach ($statsData['periods'] as $period) {
             foreach ($period['surfaces'] as $surface) {
-                $stats = $repository->findOneBy([
+                $stats = $this->statsRepo->findOneBy([
                     'player'  => $player->getId(),
                     'year'    => $period['year'],
                     'surface' => $surface['type'],

@@ -2,18 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\PlayerStatistics;
-use App\Factory\PlayerDoublesRankingFactory;
-use App\Factory\PlayerFactory;
-use App\Factory\PlayerSinglesRankingFactory;
-use App\Factory\PlayerStatisticsFactory;
 use App\Form\PlayerSearchType;
 use App\Repository\PlayerRepository;
-use App\Services\API\APICall;
+use App\Services\Players\AddPlayerService;
 use App\Services\PlayerStatistics\PlayerStatisticsFormatter;
 use App\Services\Search\SearchFormatter;
 use App\Services\Search\SearchResultsToJson;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,16 +53,22 @@ class PlayerController extends AbstractController
      * @param string                    $slug
      * @param int                       $apiIdInt
      * @param PlayerStatisticsFormatter $formatter
+     * @param AddPlayerService          $addPlayerService
      *
      * @return Response
      *
      * @Route("/player/{slug}-{apiIdInt}", name="player_view", requirements={"apiIdInt":"\d+", "slug":"[a-z0-9\-]*"})
+     *
+     * @throws ExceptionInterface
      */
-    public function viewPlayer(string $slug, int $apiIdInt, PlayerStatisticsFormatter $formatter) : Response
+    public function viewPlayer(string $slug, int $apiIdInt, PlayerStatisticsFormatter $formatter, AddPlayerService $addPlayerService) : Response
     {
         $player = $this->repository->findOneBy([
             'apiId' => 'sr:competitor:'.$apiIdInt,
         ]);
+        if (null === $player) {
+            $player = $addPlayerService->addPlayer($apiIdInt);
+        }
         if ($player->getSlug() !== $slug) {
             return $this->redirectToRoute('player_view', [
                 'apiIdInt' => $player->getApiIdInt(),
@@ -126,47 +126,5 @@ class PlayerController extends AbstractController
         $jsonResponse = $searchResultsToJson->searchResultsToJson($foundPlayers);
 
         return new JsonResponse($jsonResponse, 200, [], true);
-    }
-
-    /**
-     * @param APICall                     $apicall
-     * @param EntityManagerInterface      $em
-     * @param PlayerFactory               $playerFactory
-     * @param PlayerSinglesRankingFactory $singlesRankingFactory
-     * @param PlayerDoublesRankingFactory $doublesRankingFactory
-     * @param PlayerStatisticsFactory     $statisticsFactory
-     *
-     * @return Response
-     *
-     * @Route("/addplayer/", name="player_add")
-     *
-     * @throws ExceptionInterface|\Exception
-     */
-    public function addPlayer(APICall $apicall, EntityManagerInterface $em, PlayerFactory $playerFactory, PlayerSinglesRankingFactory $singlesRankingFactory, PlayerDoublesRankingFactory $doublesRankingFactory, PlayerStatisticsFactory $statisticsFactory) : Response
-    {
-        $statsRepo = $this->getDoctrine()->getRepository(PlayerStatistics::class);
-        $id = 117916;
-        $url = 'https://api.sportradar.com/tennis-t2/fr/players/sr:competitor:'.$id.'/profile.json?api_key=';
-        $playerArray = $apicall->sportradarCall($url);
-        $player = $playerFactory->create($playerArray['player'], $this->repository);
-        $singlesRanking = $singlesRankingFactory->create($player, $playerArray['rankings']);
-        $doublesRanking = $doublesRankingFactory->create($player, $playerArray['rankings']);
-        $statistics = $statisticsFactory->create($player, $playerArray['statistics'], $statsRepo);
-        $em->persist($player);
-        if (null !== $singlesRanking) {
-            $em->persist($singlesRanking);
-        }
-        if (null !== $doublesRanking) {
-            $em->persist($doublesRanking);
-        }
-        foreach ($statistics as $stats) {
-            $em->persist($stats);
-        }
-        $em->flush();
-
-        return $this->redirectToRoute('player_view', [
-            'apiIdInt' => $player->getApiIdInt(),
-            'slug'     => $player->getSlug(),
-        ]);
     }
 }
