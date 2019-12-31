@@ -4,12 +4,28 @@ namespace App\Factory;
 
 use App\Entity\Player;
 use App\Entity\PlayerDoublesRanking;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Class PlayerDoublesRankingFactory
  */
 class PlayerDoublesRankingFactory
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * PlayerDoublesRankingFactory constructor.
+     *
+     * @param EntityManagerInterface $em
+     */
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     /**
      * @param Player $player
      * @param array  $rankingData
@@ -39,6 +55,8 @@ class PlayerDoublesRankingFactory
                 return null;
             }
         }
+        $this->em->persist($doublesRanking);
+        $this->em->flush();
 
         return $doublesRanking;
     }

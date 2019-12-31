@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Classements Live{% endblock %}
+
+{% block body %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link text-info active pr-5" data-toggle="tab" href="#ATP">ATP</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger pr-5" data-toggle="tab" href="#WTA">WTA</a>
+        </li>
+    </ul>
+    <div id="live-rankings" class="tab-content">
+        <div class="tab-pane fade show active" id="ATP">
+            <p>Live ATP</p>
+        </div>
+        <div class="tab-pane fade show" id="WTA">
+            <p>Live WTA</p>
+        </div>
+    </div>
+{% endblock %}

@@ -16,7 +16,7 @@ class PlayerStatisticsFormatter
      */
     public function statsFormatter(PersistentCollection $playerStats) : array
     {
-        $playerStatsArray = $playerStats->getValues();
+        $playerStatsArray = $playerStats->toArray();
         $formattedStats = [];
         $currentYear = $playerStatsArray[0]->getYear();
         $arrayYear = [

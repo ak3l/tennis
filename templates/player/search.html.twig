@@ -16,9 +16,13 @@
                             <td>
                                 <a href="{{ path('player_view', {'apiIdInt': player.apiIdInt, 'slug': player.slug}) }}">
                                     <img class="mr-2"
-                                         src="{{ asset('build/players/'~ player.abbreviation ~ '.jpg' ) }}"
+                                         src="{{ asset('build/players/'~ player.abbreviation | playerPicture ~ '.jpg' ) }}"
                                          alt="{{ player.name }}"
                                          height="50" width="50"/>
+                                    <img class="mb-1"
+                                         src="{{ asset('build/flags/'~ player.countryCode ~'.png') }}"
+                                         alt="{{ player.nationality }}"
+                                         height="12" width="15"/>
                                     {{ player.name }}
                                 </a>
                             </td>

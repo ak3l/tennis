@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\Player;
 use App\Repository\PlayerRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Class PlayerFactory
@@ -11,16 +12,37 @@ use App\Repository\PlayerRepository;
 class PlayerFactory
 {
     /**
-     * @param array            $playerData
-     * @param PlayerRepository $repository
+     * @var PlayerRepository
+     */
+    private $playerRepo;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * PlayerFactory constructor.
+     *
+     * @param PlayerRepository       $playerRepo
+     * @param EntityManagerInterface $em
+     */
+    public function __construct(PlayerRepository $playerRepo, EntityManagerInterface $em)
+    {
+        $this->playerRepo = $playerRepo;
+        $this->em = $em;
+    }
+
+    /**
+     * @param array $playerData
      *
      * @return Player
      *
      * @throws \Exception
      */
-    public function create(array $playerData, PlayerRepository $repository) : Player
+    public function create(array $playerData) : Player
     {
-        $player = $repository->findOneBy([
+        $player = $this->playerRepo->findOneBy([
             'apiId' => $playerData['id'],
         ]);
         if (null === $player) {
@@ -41,6 +63,8 @@ class PlayerFactory
             ->setHighestSinglesRanking($playerData['highest_singles_ranking'])
             ->setHighestSinglesRankingDate(date_create_from_format('m.Y', $playerData['date_highest_singles_ranking']))
             ->setUpdatedAt(new \DateTime());
+        $this->em->persist($player);
+        $this->em->flush();
 
         return $player;
     }

@@ -27,8 +27,15 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('player_index') }}">Joueurs</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Classement</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Classements
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ path('rankings_official') }}">Officiel</a>
+                                    <a class="dropdown-item" href="{{ path('rankings_live') }}">Live</a>
+                                    <a class="dropdown-item" href="{{ path('rankings_race') }}">Race</a>
+                                </div>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Calendrier</a>

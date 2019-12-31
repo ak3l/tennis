@@ -10,6 +10,21 @@ use App\Repository\PlayerRepository;
 class SearchFormatter
 {
     /**
+     * @var PlayerRepository
+     */
+    private $playerRepository;
+
+    /**
+     * SearchFormatter constructor.
+     *
+     * @param PlayerRepository $playerRepository
+     */
+    public function __construct(PlayerRepository $playerRepository)
+    {
+        $this->playerRepository = $playerRepository;
+    }
+
+    /**
      * @param string $string
      *
      * @return array
@@ -27,16 +42,15 @@ class SearchFormatter
     }
 
     /**
-     * @param array            $searchArray
-     * @param PlayerRepository $repository
+     * @param array $searchArray
      *
      * @return array
      */
-    public function getSearchedPlayers(array $searchArray, PlayerRepository $repository): array
+    public function getSearchedPlayers(array $searchArray): array
     {
         $foundPlayers = [];
         foreach ($searchArray as $name) {
-            $players = $repository->searchPlayersByName($name);
+            $players = $this->playerRepository->searchPlayersByName($name);
             $foundPlayers = array_merge($foundPlayers, $players);
         }
         $foundPlayers = array_unique($foundPlayers, SORT_REGULAR);
